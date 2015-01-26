@@ -1,0 +1,29 @@
+[Unit]
+Description=GitLab Gollum Unicorn Server
+Requires=redis.service
+After=redis.service network.target
+
+[Service]
+User=gitlab
+Group=gitlab
+WorkingDirectory=/usr/share/webapps/gitlab-gollum
+Environment=RAILS_ENV=production
+SyslogIdentifier=gitlab-gollum-unicorn
+PIDFile=/run/gitlab-gollum/unicorn.pid
+
+RuntimeDirectory=gitlab-gollum
+RuntimeDirectoryMode=775
+
+CapabilityBoundingSet=
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=full
+ProtectHome=true
+NoNewPrivileges=true
+
+ExecStart=/usr/bin/bundle exec "unicorn -c unicorn.rb -E production"
+ExecStop=/usr/bin/kill -QUIT $MAINPID
+ExecReload=/usr/bin/kill -USR2 $MAINPID
+
+[Install]
+WantedBy=gitlab.target
